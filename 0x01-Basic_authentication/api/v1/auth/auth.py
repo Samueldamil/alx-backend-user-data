@@ -18,9 +18,9 @@ class Auth:
                     pattern = '{}/*'.format(exclusion_path[0:-1])
                 else:
                     pattern = '{}/*'.format(exclusion_path)
-                    if re.match(pattern, path):
-                        return False
-                return True
+                if re.match(pattern, path):
+                    return False
+        return True
 
     def authorization_header(self, request=None) -> str:
         """Defines the authorization header"""
