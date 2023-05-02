@@ -3,24 +3,25 @@
 
 from flask import request
 from typing import List, TypeVar
+import re
 
 
 class Auth:
-    """Authorization class"""
+    """Authentication class module"""
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """Retricts app access to authorization first"""
-        if path is None or excluded_paths is None or not len(excluded_paths):
-            return True
-        if path[-1] != '/':
-            path += '/'
-        for i in excluded_paths:
-            if i.endswith('*'):
-                if path.startswith(i[:1]):
+        """Checks if the path requires authentication"""
+        if path is not None and excluded_paths is not None:
+            for exclusion_path in map(lambda x: x.strip(), excluded_paths):
+                pattern = ''
+                if exclusion_path[-1] == '*':
+                    pattern = '{}.*'.format(exclusion_path[0:-1])
+                elif exclusion_path[-1] == '/':
+                    pattern = '{}/*'.format(exclusion_path[0:-1])
+                else:
+                    pattern = '{}/*'.format(exclusion_path)
+                if re.match(pattern, path):
                     return False
-        if path in excluded_paths:
-            return False
-        else:
-            return True
+        return True
 
     def authorization_header(self, request=None) -> str:
         """Defines the authorization header"""
